@@ -1,0 +1,33 @@
+{
+  "name": "course-project",
+  "version": "1.0.0",
+  "description": "Statistical Portal project for LUT University web programming course.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikodemiusTKT/lut-stat-portal-webprog2024.git"
+  },
+  "keywords": [
+    "statistics",
+    "open-data",
+    "lut",
+    "web",
+    "charts",
+    "university"
+  ],
+  "author": "Teemu Tanninen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NikodemiusTKT/lut-stat-portal-webprog2024/issues"
+  },
+  "homepage": "https://github.com/NikodemiusTKT/lut-stat-portal-webprog2024#readme",
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  }
+}
