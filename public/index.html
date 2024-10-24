@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistical Portal</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <!-- Custom CSS (optional) -->
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+      .chart-container {
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="bg-primary text-white text-center py-4">
+      <h1>Statistical Data Portal</h1>
+      <p class="lead">
+        Visualize election results, unemployment rates, and more across
+        municipalities
+      </p>
+    </header>
+
+    <!-- Main Layout: Map and Sidebar -->
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar for Controls -->
+        <aside class="col-md-3 bg-light py-4">
+          <h4>Data Controls</h4>
+          <!-- Dropdown to Select Dataset -->
+          <div class="mb-3">
+            <label for="datasetSelect" class="form-label">Select Dataset</label>
+            <select id="datasetSelect" class="form-select">
+              <option value="elections">Municipality Elections</option>
+              <option value="unemployment">Unemployment Rates</option>
+              <option value="education">Education Levels</option>
+            </select>
+          </div>
+
+          <!-- Year Selection -->
+          <div class="mb-3">
+            <label for="yearSelect" class="form-label">Select Year</label>
+            <select id="yearSelect" class="form-select">
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+              <option value="2018">2018</option>
+            </select>
+          </div>
+
+          <!-- Download Button -->
+          <button class="btn btn-primary w-100 mt-3" id="downloadBtn">
+            Download Visualization
+          </button>
+        </aside>
+
+        <!-- Map and Chart Section -->
+        <main class="col-md-9 py-4">
+          <!-- Map Section -->
+          <div id="map"></div>
+
+          <!-- Chart Section -->
+          <div class="chart-container mt-4">
+            <h4>Data Visualization</h4>
+            <div id="chart"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+      <p>
+        Data provided by
+        <a
+          href="https://statfin.stat.fi/PxWeb/pxweb/en/StatFin/"
+          class="text-white text-decoration-none"
+          >Tilastokeskus</a
+        >
+      </p>
+    </footer>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Frappe.js -->
+    <script src="https://unpkg.com/frappe-charts@1.5.4/dist/frappe-charts.min.iife.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="../src/index.js"></script>
+  </body>
+</html>
