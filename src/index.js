@@ -6,7 +6,7 @@ import { generateYears } from "./utils/utilities.js";
 
 window.onload = async () => {
   // const years = generateYears(1999, 2023, 4);
-  const years = ["2023"];
+  const years = ["2019", "2023"];
   const parties = [];
   const munitipalityModel = new MunicipalityModel();
   const municipalityData = await munitipalityModel.fetchMunicipalityData();
@@ -19,6 +19,7 @@ window.onload = async () => {
     return combineCodes(electoralDistrictCode, municipalityCode);
   });
   const municipalities = combinedCodes;
+  municipalities.push("SSS");
   // municipalities = ["SSS"];
   const baseDataStructure = municipalityData;
   const politicalController = new PoliticalPartyController(

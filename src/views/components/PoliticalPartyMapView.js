@@ -21,7 +21,6 @@ class PoliticalPartyMapView {
   }
 
   styleFunction(feature, politicalData, year) {
-    year = year[0];
     if (feature.properties?.kunta) {
       const municipalityCode = feature.properties.kunta;
       const politicalInfo = politicalData[year]?.[municipalityCode] || {};

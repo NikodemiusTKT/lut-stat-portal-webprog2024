@@ -26,7 +26,7 @@ class PoliticalPartyController {
         politicalData,
       );
       const geoJsonData = await this.geoJsonModel.fetchGeoJsonData({});
-      this.mapView.addGeoJsonLayer(geoJsonData, politicalData, this.years);
+      this.mapView.addGeoJsonLayer(geoJsonData, politicalData, ...this.years);
       // renderMap(data);
     } catch (error) {
       console.error("Error loading political party data:", error);

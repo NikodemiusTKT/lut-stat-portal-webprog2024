@@ -2,7 +2,6 @@ import ChartView from "./components/chartView.js";
 
 class ChartFactory {
   static createChart(elementId, type, data) {
-    this.data = data;
     const chartData = this.processData(type, data);
     const chartConfig = this.getChartConfig(type, chartData.labels);
     const chartView = new ChartView(elementId);
@@ -13,92 +12,112 @@ class ChartFactory {
   static processData(type, data) {
     switch (type) {
       case "population":
-        return {
-          labels: data.map((item) => item.municipality),
-          datasets: [
-            {
-              name: "Population",
-              values: data.map((item) => item.population),
-            },
-          ],
-        };
+        return this.processPopulationData(data);
       case "employment":
-        return {
-          labels: data.map((item) => item.municipality),
-          datasets: [
-            {
-              name: "Employment Rate",
-              values: data.map((item) => item.employmentRate),
-            },
-          ],
-        };
+        return this.processEmploymentData(data);
       case "politicalParties":
-        const municipality = "SSS";
-        const year = "2023";
-
-        if (!data[year] || !data[year][municipality]) {
-          return { labels: [], datasets: [] };
-        }
-
-        const partiesData = data[year][municipality].politicalParties;
-        const labels = Object.keys(partiesData);
-        const values = labels.map((party) => partiesData[party]);
-
-        return {
-          labels: labels,
-          datasets: [
-            {
-              name: `Votes in ${year}`,
-              values: values,
-              chartType: "bar",
-            },
-          ],
-        };
+        return this.processPoliticalPartiesData(data);
       default:
-        return {};
+        return { labels: [], datasets: [] };
     }
+  }
+
+  static processPopulationData(data) {
+    return {
+      labels: data.map((item) => item.municipality),
+      datasets: [
+        {
+          name: "Population",
+          values: data.map((item) => item.population),
+        },
+      ],
+    };
+  }
+
+  static processEmploymentData(data) {
+    return {
+      labels: data.map((item) => item.municipality),
+      datasets: [
+        {
+          name: "Employment Rate",
+          values: data.map((item) => item.employmentRate),
+        },
+      ],
+    };
+  }
+
+  static processPoliticalPartiesData(data) {
+    const municipality = "SSS";
+    const year = "2023";
+
+    if (!data[year] || !data[year][municipality]) {
+      return { labels: [], datasets: [] };
+    }
+
+    const partiesData = data[year][municipality].politicalParties;
+    const labels = Object.keys(partiesData);
+    const values = labels.map((party) => partiesData[party]);
+
+    return {
+      labels: labels,
+      datasets: [
+        {
+          name: `Votes in ${year}`,
+          values: values,
+          chartType: "bar",
+        },
+      ],
+    };
   }
 
   static getChartConfig(type, labels) {
     switch (type) {
       case "population":
-        return {
-          type: "bar",
-          height: 300,
-          colors: ["#7cd6fd", "#743ee2"],
-        };
+        return this.getPopulationChartConfig();
       case "employment":
-        return {
-          type: "line",
-          height: 250,
-          colors: ["#7cd6fd", "#743ee2"],
-        };
+        return this.getEmploymentChartConfig();
       case "politicalParties":
-        return {
-          type: "bar",
-          height: 250,
-          colors: labels.map((label) => this.getPartyColor(label)),
-          tooltipOptions: {
-            formatTooltipX: (d) => (d + "").toUpperCase(),
-            formatTooltipY: (d) => d + "%",
-          },
-          barOptions: { stacked: 0 },
-        };
+        return this.getPoliticalPartiesChartConfig(labels);
       default:
-        return {
-          type: "bar",
-          height: 250,
-          colors: ["#7cd6fd", "#743ee2"],
-        };
+        return this.getDefaultChartConfig();
     }
   }
 
-  static generateColors(numColors) {
-    const colors = [];
-    for (let i = 0; i < numColors; i++) {
-      colors.push(`hsl(${(i * 360) / numColors}, 70%, 50%)`);
-    }
-    return colors;
+  static getPopulationChartConfig() {
+    return {
+      type: "bar",
+      height: 300,
+      colors: ["#7cd6fd", "#743ee2"],
+    };
+  }
+
+  static getEmploymentChartConfig() {
+    return {
+      type: "line",
+      height: 250,
+      colors: ["#7cd6fd", "#743ee2"],
+    };
+  }
+
+  static getPoliticalPartiesChartConfig(labels) {
+    return {
+      type: "bar",
+      height: 250,
+      colors: labels.map((label) => this.getPartyColor(label)),
+      tooltipOptions: {
+        formatTooltipX: (d) => (d + "").toUpperCase(),
+        formatTooltipY: (d) => d + "%",
+      },
+      barOptions: { stacked: 0 },
+    };
+  }
+
+  static getDefaultChartConfig() {
+    return {
+      type: "bar",
+      height: 250,
+      colors: ["#7cd6fd", "#743ee2"],
+    };
   }
 
   static getPartyColor(party) {
