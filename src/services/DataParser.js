@@ -18,8 +18,11 @@ class DefaultParser {
 class ImmigrationParser {
   parse(data) {
     // Specific parsing logic for immigration data
-    const values = data.dataset.value;
-    const indexes = data.dataset.dimension["Tuloalue"].category.index;
+    if (!data.dataset) {
+      throw new Error("Dataset is undefined");
+    }
+    const { value: values, dimension } = data.dataset;
+    const indexes = dimension["Tuloalue"].category.index;
     return { values, indexes };
   }
 }
@@ -27,56 +30,42 @@ class ImmigrationParser {
 class EmigrationParser {
   parse(data) {
     // Specific parsing logic for emigration data
-    const values = data.dataset.value;
-    const indexes = data.dataset.dimension["Lähtöalue"].category.index;
+    if (!data.dataset) {
+      throw new Error("Dataset is undefined");
+    }
+    const { value: values, dimension } = data.dataset;
+    const indexes = dimension["Lähtöalue"].category.index;
     return { values, indexes };
   }
 }
 
-class PoliticalPartyParser {
+class MunicipalityParser {
   parse(data) {
-    const values = data.value;
-    const labels = data.dimension["Puolue"].category.label;
-    const indexes = data.dimension["Puolue"].category.index;
-    const years = data.dimension["Vuosi"].category.label;
-    const yearIndexes = data.dimension["Vuosi"].category.index;
-    console.log(data);
-    const municipalities =
-      data.dimension["Vaalipiiri ja kunta vaalivuonna"].category.label;
-    const municipalityIndexes =
-      data.dimension["Vaalipiiri ja kunta vaalivuonna"].category.index;
+    const baseDataStructure = {};
+    data.forEach((item) => {
+      const code = item.code;
+      const nameObj = item.classificationItemNames.find(
+        (nameObj) => nameObj.lang === "fi",
+      );
+      const name = nameObj ? nameObj.name : "Unknown"; // Handle case where nameObj is undefined
 
-    const parsedData = {};
-
-    // Initialize parsedData structure
-    Object.keys(municipalityIndexes).forEach((municipalityKey) => {
-      const municipalityLabel = municipalities[municipalityKey];
-      parsedData[municipalityLabel] = {};
-    });
-
-    // Iterate over years, municipalities, and parties to populate parsedData
-    let valueIndex = 0;
-    Object.keys(yearIndexes).forEach((yearKey) => {
-      const yearLabel = years[yearKey];
-      Object.keys(municipalityIndexes).forEach((municipalityKey) => {
-        const municipalityLabel = municipalities[municipalityKey];
-        parsedData[municipalityLabel][yearLabel] =
-          parsedData[municipalityLabel][yearLabel] || {};
-
-        Object.keys(indexes).forEach((partyKey) => {
-          const partyLabel = labels[partyKey];
-          const value = values[valueIndex];
-
-          // Handle null values
-          parsedData[municipalityLabel][yearLabel][partyLabel] =
-            value !== null ? value : 0;
-
-          valueIndex++;
-        });
+      // Initialize the structure for each year
+      const years = ["2023"]; // Add more years as needed
+      years.forEach((year) => {
+        if (!baseDataStructure[year]) {
+          baseDataStructure[year] = {};
+        }
+        if (!baseDataStructure[year][code]) {
+          baseDataStructure[year][code] = {
+            name,
+            politicalParties: {},
+            population: [],
+            // Add more data types as needed
+          };
+        }
       });
     });
-
-    return parsedData;
+    return baseDataStructure;
   }
 }
 
@@ -88,12 +77,18 @@ class GeoJsonParser {
   }
 }
 
+class PopulationDataParser {
+  parse(data) {
+    return data;
+  }
+}
+
 export {
   DataParser,
   DefaultParser,
-  EmploymentParser,
-  PoliticalPartyParser,
   ImmigrationParser,
   EmigrationParser,
+  MunicipalityParser,
   GeoJsonParser,
+  PopulationDataParser,
 };

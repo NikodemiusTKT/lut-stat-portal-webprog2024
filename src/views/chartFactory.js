@@ -4,7 +4,7 @@ class ChartFactory {
   static createChart(elementId, type, data) {
     this.data = data;
     const chartData = this.processData(type, data);
-    const chartConfig = this.getChartConfig(type);
+    const chartConfig = this.getChartConfig(type, chartData.labels);
     const chartView = new ChartView(elementId);
     chartView.clearChart();
     return chartView.renderChart(chartData, chartConfig.type, chartConfig);
@@ -33,25 +33,33 @@ class ChartFactory {
           ],
         };
       case "politicalParties":
-        const years = Object.keys(data[Object.keys(data)[0]]);
-        const datasets = Object.keys(data).map((party) => ({
-          name: party,
-          values: years.map((year) => data[party][year]),
-          chartType: "bar",
-        }));
+        const municipality = "SSS";
+        const year = "2023";
+
+        if (!data[year] || !data[year][municipality]) {
+          return { labels: [], datasets: [] };
+        }
+
+        const partiesData = data[year][municipality].politicalParties;
+        const labels = Object.keys(partiesData);
+        const values = labels.map((party) => partiesData[party]);
+
         return {
-          labels: years,
-          datasets: datasets,
-          yRegions: [{ label: "% of all votes", start: 0, end: 50 }],
+          labels: labels,
+          datasets: [
+            {
+              name: `Votes in ${year}`,
+              values: values,
+              chartType: "bar",
+            },
+          ],
         };
       default:
         return {};
     }
   }
 
-  static getChartConfig(type, numDatasets) {
-    // const colors = this.generateColors(numDatasets);
-
+  static getChartConfig(type, labels) {
     switch (type) {
       case "population":
         return {
@@ -69,14 +77,12 @@ class ChartFactory {
         return {
           type: "bar",
           height: 250,
-          colors: Object.keys(this.data).map((party) =>
-            this.getPartyColor(party),
-          ),
+          colors: labels.map((label) => this.getPartyColor(label)),
           tooltipOptions: {
             formatTooltipX: (d) => (d + "").toUpperCase(),
             formatTooltipY: (d) => d + "%",
           },
-          barOptions: { stacked: 1 },
+          barOptions: { stacked: 0 },
         };
       default:
         return {
@@ -94,6 +100,7 @@ class ChartFactory {
     }
     return colors;
   }
+
   static getPartyColor(party) {
     const partyColorMap = {
       KOK: "#003580",

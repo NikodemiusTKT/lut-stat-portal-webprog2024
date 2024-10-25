@@ -11,8 +11,8 @@ class MapController {
 
   async loadMapData() {
     try {
-      const geoJsonData = await this.geoJsonModel.fetchGeoJsonData();
-      const migrationData = await this.migrationModel.fetchMigrationData();
+      const geoJsonData = await this.geoJsonModel.fetchGeoJsonData({});
+      const migrationData = await this.migrationModel.fetchMigrationData({});
       this.mapView.addGeoJsonLayer(geoJsonData, migrationData);
     } catch (error) {
       console.error("Error loading map data:", error);

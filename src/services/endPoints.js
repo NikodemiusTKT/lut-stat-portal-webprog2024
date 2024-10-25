@@ -1,8 +1,8 @@
 const BASE_URL = "https://api.stat.fi/rest/v1/";
 
 const ENDPOINTS = {
-  MUNICIPALITIES: {
-    url: `${BASE_URL}municipalities`,
+  MUNICIPALITY: {
+    url: "https://data.stat.fi/api/classifications/v2/classifications/kunta_1_20240101/classificationItems?content=data&meta=max&lang=fi&format=json",
     method: "GET",
   },
   EMPLOYMENT: (year) => ({

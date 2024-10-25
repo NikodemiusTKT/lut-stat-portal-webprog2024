@@ -21,17 +21,19 @@ class CustomMapView {
 
   styleFunction(feature, migrationData) {
     if (feature.properties?.kunta) {
-      const { immigration, emigration } =
-        migrationData[feature.properties.kunta] || {};
-      const hue = this.calcHue(immigration, emigration);
+      const municipalityCode = feature.properties.kunta;
+      const migrationInfo = migrationData[municipalityCode] || {};
+      const { immigration = [], emigration = [] } = migrationInfo.data || {};
+      const hue = this.calcHue(immigration[0] || 0, emigration[0] || 0);
       return { color: `hsl(${hue},75%,50%)`, weight: 2 };
     }
     return { color: "#ccc", weight: 1 };
   }
 
   calcHue(positiveMigration, negativeMigration) {
-    const hue = Math.pow(positiveMigration / (negativeMigration || 1), 3) * 60;
-    return Math.min(hue, 120);
+    const ratio = positiveMigration / (negativeMigration || 1);
+    const hue = Math.min(Math.pow(ratio, 3) * 60, 120);
+    return hue;
   }
 
   onEachFunction(feature, layer, migrationData) {
@@ -39,12 +41,13 @@ class CustomMapView {
       layer.bindTooltip(feature.properties.name).openTooltip();
     }
     if (feature.properties?.kunta) {
-      const { immigration, emigration } = migrationData[
-        feature.properties.kunta
-      ] || { immigration: 0, emigration: 0 };
-      const popUpTemplate = `<p>Positive migration: ${immigration}</p><p>Negative migration: ${emigration}</p>`;
+      const municipalityCode = feature.properties.kunta;
+      const migrationInfo = migrationData[municipalityCode] || {};
+      const { immigration = [], emigration = [] } = migrationInfo.data || {};
+      const popUpTemplate = `<p>Positive migration: ${immigration[0] || 0}</p><p>Negative migration: ${emigration[0] || 0}</p>`;
       layer.bindPopup(popUpTemplate);
     }
   }
 }
+
 export default CustomMapView;

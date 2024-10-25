@@ -1,24 +1,26 @@
 class ApiService {
   constructor(config) {
-    this.url = config.url;
-    this.method = config.method;
-    this.headers = config.headers || {};
-    this.body = config.body || null;
+    this.config = config;
   }
 
-  async request(config) {
-    const options = {
-      method: this.method,
-      headers: this.headers,
-    };
+  async request(config = this.config) {
+    try {
+      const response = await fetch(config.url, {
+        method: config.method || "GET",
+        headers: config.headers || {},
+        body: config.body ? JSON.stringify(config.body) : null,
+      });
 
-    if (this.body) {
-      options.body = JSON.stringify(this.body);
-      this.headers["Content-Type"] = "application/json";
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error making API request:", error);
+      throw error;
     }
-
-    const response = await fetch(this.url, options);
-    return response.json();
   }
 }
 

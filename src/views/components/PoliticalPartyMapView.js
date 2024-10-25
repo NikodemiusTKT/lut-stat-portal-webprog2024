@@ -10,38 +10,68 @@ class PoliticalPartyMapView {
     }).addTo(this.map);
   }
 
-  addGeoJsonLayer(geoJsonData, politicalData) {
+  addGeoJsonLayer(geoJsonData, politicalData, year) {
+    console.log("Adding GeoJson layer");
     const geoFeature = L.geoJson(geoJsonData, {
-      style: (feature) => this.styleFunction(feature, politicalData),
+      style: (feature) => this.styleFunction(feature, politicalData, year),
       onEachFeature: (feature, layer) =>
-        this.onEachFunction(feature, layer, politicalData),
+        this.onEachFunction(feature, layer, politicalData, year),
     }).addTo(this.map);
     this.map.fitBounds(geoFeature.getBounds());
   }
 
-  styleFunction(feature, politicalData) {
+  styleFunction(feature, politicalData, year) {
+    year = year[0];
     if (feature.properties?.kunta) {
-      const partyPower = politicalData[feature.properties.kunta] || {};
-      const hue = this.calcHue(partyPower);
+      const municipalityCode = feature.properties.kunta;
+      const politicalInfo = politicalData[year]?.[municipalityCode] || {};
+      const { politicalParties = {} } = politicalInfo || {};
+      const dominantParty = this.getDominantParty(politicalParties);
+      const hue = this.calcHue(dominantParty);
       return { color: `hsl(${hue},75%,50%)`, weight: 2 };
     }
     return { color: "#ccc", weight: 1 };
   }
 
-  calcHue(partyPower) {
-    // Calculate hue based on the political power of the party
-    // For simplicity, let's assume partyPower is a value between 0 and 1
-    const hue = partyPower * 120; // 0 (red) to 120 (green)
-    return hue;
+  getDominantParty(politicalParties) {
+    let maxVotes = 0;
+    let dominantParty = null;
+    for (const [party, votes] of Object.entries(politicalParties)) {
+      if (votes > maxVotes) {
+        maxVotes = votes;
+        dominantParty = party;
+      }
+    }
+    return dominantParty;
   }
 
-  onEachFunction(feature, layer, politicalData) {
+  calcHue(dominantParty) {
+    const partyColorMap = {
+      KOK: 240, // Blue
+      PS: 60, // Yellow
+      SDP: 0, // Red
+      KESK: 120, // Green
+      VIHR: 90, // Light Green
+      VAS: 330, // Pink
+      RKP: 270, // Purple
+      KD: 300, // Dark Purple
+      LIIKE: 180, // Cyan
+    };
+
+    return partyColorMap[dominantParty] || 0; // Default to red if party not found
+  }
+
+  onEachFunction(feature, layer, politicalData, year) {
     if (feature.properties?.name) {
       layer.bindTooltip(feature.properties.name).openTooltip();
     }
     if (feature.properties?.kunta) {
-      const partyPower = politicalData[feature.properties.kunta] || 0;
-      const popUpTemplate = `<p>Political Power: ${partyPower}</p>`;
+      const municipalityCode = feature.properties.kunta;
+      const politicalInfo = politicalData[year]?.[municipalityCode] || {};
+      const { politicalParties = {} } = politicalInfo || {};
+      const dominantParty = this.getDominantParty(politicalParties);
+      const maxVotes = politicalParties[dominantParty] || 0;
+      const popUpTemplate = `<p>Dominant Party: ${dominantParty}</p><p>Votes: ${maxVotes}</p>`;
       layer.bindPopup(popUpTemplate);
     }
   }

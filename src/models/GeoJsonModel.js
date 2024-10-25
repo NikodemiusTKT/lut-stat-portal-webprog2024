@@ -1,16 +1,15 @@
 import ApiServiceFactory from "../services/ApiServiceFactory.js";
-import DataModel from "./DataModel.js";
-import { DataParser, GeoJsonParser } from "../services/DataParser.js";
+import BaseDataModel from "./BaseDataModel.js";
 
-class GeoJsonModel extends DataModel {
+class GeoJsonModel extends BaseDataModel {
   constructor() {
-    const geoJsonApiService = ApiServiceFactory.createService("GEOJSON");
-    const geoJsonParser = new DataParser(new GeoJsonParser());
-    super(geoJsonApiService, geoJsonParser);
+    super("GEOJSON");
   }
 
-  async fetchGeoJsonData() {
-    return await this.apiService.request(null, "geoJsonData");
+  async fetchGeoJsonData(baseDataStructure = {}) {
+    const config = this.apiService.config;
+    const cacheKey = "geoJsonData";
+    return await this.fetchData(config, cacheKey, baseDataStructure);
   }
 }
 
