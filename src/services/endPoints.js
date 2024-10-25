@@ -2,7 +2,7 @@ const BASE_URL = "https://api.stat.fi/rest/v1/";
 
 const ENDPOINTS = {
   MUNICIPALITY: {
-    url: "https://data.stat.fi/api/classifications/v2/classifications/kunta_1_20240101/classificationItems?content=data&meta=max&lang=fi&format=json",
+    url: "https://data.stat.fi/api/classifications/v2/correspondenceTables/kunta_1_20240101%23vaalipiiri_1_20240101/maps?content=data&meta=min&lang=fi&format=json",
     method: "GET",
   },
   EMPLOYMENT: (year) => ({

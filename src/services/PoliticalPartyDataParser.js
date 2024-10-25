@@ -1,74 +1,75 @@
 class PoliticalPartyDataParser {
   parse(data, baseDataStructure = {}) {
-    const { value: values, dimension } = data;
-    const { label: partyLabels, index: partyIndexes } =
-      dimension["Puolue"].category;
-    const { label: yearLabels, index: yearIndexes } =
-      dimension["Vuosi"].category;
-    const { label: municipalityLabels, index: municipalityIndexes } =
-      dimension["Vaalipiiri ja kunta vaalivuonna"].category;
+    const { value: values, dimension, size } = data;
+    const partyLabels = dimension["Puolue"].category.label;
+    const yearLabels = dimension["Vuosi"].category.label;
+    const municipalityLabels =
+      dimension["Vaalipiiri ja kunta vaalivuonna"].category.label;
 
-    // Populate baseDataStructure with political party data
+    // Get the index values for years, municipalities, and parties
+    const yearIndex = dimension["Vuosi"].category.index;
+    const municipalityIndex =
+      dimension["Vaalipiiri ja kunta vaalivuonna"].category.index;
+    const partyIndex = dimension["Puolue"].category.index;
+
+    // Get the keys for years, municipalities, and parties
+    const yearKeys = Object.keys(yearIndex);
+    const municipalityKeys = Object.keys(municipalityIndex);
+    const partyKeys = Object.keys(partyIndex);
+
+    // Extract sizes
+    const [numYears, numParties, numMunicipalities] = size;
+
+    // Sort keys based on their index values
+    const sortedYearKeys = yearKeys.sort((a, b) => yearIndex[a] - yearIndex[b]);
+    const sortedMunicipalityKeys = municipalityKeys.sort(
+      (a, b) => municipalityIndex[a] - municipalityIndex[b],
+    );
+    const sortedPartyKeys = partyKeys.sort(
+      (a, b) => partyIndex[a] - partyIndex[b],
+    );
+
+    // Iterate over the values array and map them correctly
     let valueIndex = 0;
-    const yearKeys = Object.keys(yearIndexes);
-    const municipalityKeys = Object.keys(municipalityIndexes);
-    const partyKeys = Object.keys(partyIndexes);
-
-    for (const yearKey of yearKeys) {
+    for (let yearIdx = 0; yearIdx < numYears; yearIdx++) {
+      const yearKey = sortedYearKeys[yearIdx];
       const yearLabel = yearLabels[yearKey];
-      if (!baseDataStructure[yearLabel]) {
-        baseDataStructure[yearLabel] = {};
-      }
+      baseDataStructure[yearLabel] = baseDataStructure[yearLabel] || {};
 
-      for (const municipalityKey of municipalityKeys) {
-        const municipalityCode =
-          municipalityKey === "SSS"
-            ? "SSS"
-            : this.extractMunicipalityCode(municipalityKey);
-        if (!baseDataStructure[yearLabel][municipalityCode]) {
-          baseDataStructure[yearLabel][municipalityCode] = {
-            politicalParties: {},
-          };
-        }
+      for (let partyIdx = 0; partyIdx < numParties; partyIdx++) {
+        const partyKey = sortedPartyKeys[partyIdx];
+        const partyLabel = partyLabels[partyKey];
 
-        for (const partyKey of partyKeys) {
-          const partyLabel = partyLabels[partyKey];
-          const value = values[valueIndex];
+        for (
+          let municipalityIdx = 0;
+          municipalityIdx < numMunicipalities;
+          municipalityIdx++
+        ) {
+          const municipalityKey = sortedMunicipalityKeys[municipalityIdx];
+          const municipalityCode = this.getMunicipalityCode(municipalityKey);
+          baseDataStructure[yearLabel][municipalityCode] = baseDataStructure[
+            yearLabel
+          ][municipalityCode] || { politicalParties: {} };
 
-          // Initialize the party data structure if it doesn't exist
-          if (
-            !baseDataStructure[yearLabel][municipalityCode].politicalParties[
-              partyLabel
-            ]
-          ) {
-            baseDataStructure[yearLabel][municipalityCode].politicalParties[
-              partyLabel
-            ] = 0;
-          }
+          const value = values[valueIndex] || 0;
 
-          // Handle null values
           baseDataStructure[yearLabel][municipalityCode].politicalParties[
             partyLabel
-          ] += value !== null ? value : 0;
+          ] =
+            (baseDataStructure[yearLabel][municipalityCode].politicalParties[
+              partyLabel
+            ] || 0) + value;
 
           valueIndex++;
         }
       }
     }
 
-    console.log("Parsed political party data:", baseDataStructure);
     return baseDataStructure;
   }
 
-  cleanMunicipalityLabel(label) {
-    return label
-      .replace(/[^a-zA-Z\s]/g, "")
-      .replace(/KU/g, "")
-      .trim();
-  }
-
-  extractMunicipalityCode(key) {
-    return key.slice(-3); // Extract the last three digits
+  getMunicipalityCode(key) {
+    return key === "SSS" ? "SSS" : key.slice(-3);
   }
 }
 

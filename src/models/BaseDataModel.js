@@ -24,6 +24,7 @@ class BaseDataModel {
       }
 
       const data = await service.request(config);
+      console.log("data", data);
       const parsedData = parser ? parser.parse(data, baseDataStructure) : data;
       this.cacheData(cacheKey, parsedData);
       return parsedData;

@@ -40,32 +40,25 @@ class EmigrationParser {
 }
 
 class MunicipalityParser {
-  parse(data) {
-    const baseDataStructure = {};
-    data.forEach((item) => {
-      const code = item.code;
-      const nameObj = item.classificationItemNames.find(
-        (nameObj) => nameObj.lang === "fi",
-      );
-      const name = nameObj ? nameObj.name : "Unknown"; // Handle case where nameObj is undefined
+  parse(dataArray) {
+    return dataArray.map((data) => {
+      const municipalityCode = data["sourceItem"].code;
+      const electoralDistrictCode = data["targetItem"].code;
+      const municipalityName = data.sourceItem.classificationItemNames.find(
+        (name) => name.lang === "fi",
+      ).name;
+      const electoralDistrictName =
+        data.targetItem.classificationItemNames.find(
+          (name) => name.lang === "fi",
+        ).name;
 
-      // Initialize the structure for each year
-      const years = ["2023"]; // Add more years as needed
-      years.forEach((year) => {
-        if (!baseDataStructure[year]) {
-          baseDataStructure[year] = {};
-        }
-        if (!baseDataStructure[year][code]) {
-          baseDataStructure[year][code] = {
-            name,
-            politicalParties: {},
-            population: [],
-            // Add more data types as needed
-          };
-        }
-      });
+      return {
+        municipalityCode,
+        electoralDistrictCode,
+        municipalityName,
+        electoralDistrictName,
+      };
     });
-    return baseDataStructure;
   }
 }
 
