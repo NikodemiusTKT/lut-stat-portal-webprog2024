@@ -31,12 +31,19 @@ class PoliticalPartyDataParser {
 
         for (const municipalityKey of sortedMunicipalityKeys) {
           const municipalityCode = this.getMunicipalityCode(municipalityKey);
+          const municipalityName = this.getMunicipalityName(
+            municipalityLabels[municipalityKey],
+          );
           this.initializeNestedObject(baseDataStructure, [
             yearLabel,
             municipalityCode,
             "politicalParties",
             partyLabel,
           ]);
+
+          // Add municipalityName to the data structure
+          baseDataStructure[yearLabel][municipalityCode].municipalityName =
+            municipalityName;
 
           const value = values[valueIndex] || 0;
           baseDataStructure[yearLabel][municipalityCode].politicalParties[
@@ -57,6 +64,11 @@ class PoliticalPartyDataParser {
 
   getMunicipalityCode(key) {
     return key === "SSS" ? "SSS" : key.slice(-3);
+  }
+
+  getMunicipalityName(label) {
+    // Remove the prefix (e.g., "KU005 ") to get the clean municipality name
+    return label.replace(/^KU\d+\s/, "");
   }
 
   initializeNestedObject(obj, keys) {

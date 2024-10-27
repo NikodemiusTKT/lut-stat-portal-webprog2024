@@ -10,14 +10,17 @@ class PoliticalPartyMapView {
     }).addTo(this.map);
   }
 
-  addGeoJsonLayer(geoJsonData, politicalData, year) {
-    console.log("Adding GeoJson layer");
-    const geoFeature = L.geoJson(geoJsonData, {
-      style: (feature) => this.styleFunction(feature, politicalData, year),
-      onEachFeature: (feature, layer) =>
-        this.onEachFunction(feature, layer, politicalData, year),
-    }).addTo(this.map);
-    this.map.fitBounds(geoFeature.getBounds());
+  async addGeoJsonLayer(geoJsonData, politicalData, year) {
+    try {
+      const geoFeature = L.geoJson(geoJsonData, {
+        style: (feature) => this.styleFunction(feature, politicalData, year),
+        onEachFeature: (feature, layer) =>
+          this.onEachFunction(feature, layer, politicalData, year),
+      }).addTo(this.map);
+      this.map.fitBounds(geoFeature.getBounds());
+    } catch (error) {
+      console.error("Error adding GeoJson layer:", error);
+    }
   }
 
   styleFunction(feature, politicalData, year) {
@@ -70,7 +73,36 @@ class PoliticalPartyMapView {
       const { politicalParties = {} } = politicalInfo || {};
       const dominantParty = this.getDominantParty(politicalParties);
       const maxVotes = politicalParties[dominantParty] || 0;
-      const popUpTemplate = `<p>Dominant Party: ${dominantParty}</p><p>Votes: ${maxVotes}</p>`;
+
+      // Create a table of all parties and their votes
+      const partiesTable = Object.entries(politicalParties)
+        .map(
+          ([party, votes]) => `
+          <tr${party === dominantParty ? ' style="font-weight: bold;"' : ""}>
+            <td>${party}</td>
+            <td>${votes} %</td>
+          </tr>`,
+        )
+        .join("");
+
+      const popUpTemplate = `
+      <div style="font-family: Arial, sans-serif; font-size: 12px;">
+        <h4 style="margin: 0;">${feature.properties.name}</h4>
+        <p><strong>Dominant Party:</strong> ${dominantParty}</p>
+        <p><strong>Votes:</strong> ${maxVotes} %</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align: left; padding: 2px; border-bottom: 1px solid #ddd;">Party</th>
+              <th style="text-align: left; padding: 2px; border-bottom: 1px solid #ddd;">Votes (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${partiesTable}
+          </tbody>
+        </table>
+      </div>
+    `;
       layer.bindPopup(popUpTemplate);
     }
   }
