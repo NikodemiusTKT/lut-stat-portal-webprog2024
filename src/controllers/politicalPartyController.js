@@ -21,12 +21,13 @@ class PoliticalPartyController {
     try {
       const politicalData =
         await this.model.fetchPoliticalPartyData(baseDataStructure);
-      ChartFactory.createChart(
-        this.chartContainer,
-        "politicalParties",
-        politicalData,
-        ...this.years,
-      );
+      ChartFactory.createChart({
+        elementId: this.chartContainer,
+        type: "politicalParties",
+        data: politicalData,
+        years: this.years,
+        chartType: "pie",
+      });
       const geoJsonData = await this.geoJsonModel.fetchGeoJsonData({});
       await this.mapView.addGeoJsonLayer(
         geoJsonData,
@@ -42,12 +43,13 @@ class PoliticalPartyController {
 
   async updatePoliticalPartyData(newData) {
     try {
-      ChartFactory.createChart(
-        this.chartContainer,
-        "politicalParties",
-        newData,
-        ...this.years,
-      );
+      ChartFactory.createChart({
+        elementId: this.chartContainer,
+        type: "politicalParties",
+        data: politicalData,
+        years: this.years,
+        chartType: "bar",
+      });
       this.mapView.updateMap(newData, ...this.years);
     } catch (error) {
       console.error("Error updating political party data:", error);

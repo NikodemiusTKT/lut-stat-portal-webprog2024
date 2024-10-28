@@ -1,16 +1,20 @@
 // BaseChartProcessor.js
 class BaseChartProcessor {
-  process(data, year) {
-    const processedData = this.processData(data, year);
-    const chartConfig = this.getChartConfig(processedData.labels);
+  process(config) {
+    const processedData = this.processData(config);
+    const chartConfig = this.getChartConfig(
+      processedData.labels,
+      config.chartType,
+      config.years,
+    );
     return { processedData, chartConfig };
   }
 
-  processData(data, year) {
+  processData(config) {
     throw new Error("This method should be overridden");
   }
 
-  getChartConfig(labels) {
+  getChartConfig(labels, chartType) {
     throw new Error("This method should be overridden");
   }
 }

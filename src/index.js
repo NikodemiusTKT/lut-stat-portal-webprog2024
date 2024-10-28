@@ -4,7 +4,8 @@ import MunicipalityModel from "./models/MunicipalityModel.js";
 import { generateYears } from "./utils/utilities.js";
 
 window.onload = async () => {
-  const years = ["2019"];
+  // const years = generateYears(2011, 2023, 4);
+  const years = [2011];
   const parties = [];
   const municipalityModel = new MunicipalityModel();
   const municipalityData = await municipalityModel.fetchMunicipalityData();

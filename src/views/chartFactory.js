@@ -2,9 +2,9 @@ import ChartView from "./components/chartView.js";
 import BaseChartProcessor from "./BaseChartProcessor.js";
 import PoliticalChartProcessor from "./PoliticalChartProcessor.js";
 class PopulationChartProcessor extends BaseChartProcessor {
-  processData(data) {
+  processData(config) {
     return {
-      labels: data.map((item) => item.municipality),
+      labels: config.data.map((item) => item.municipality),
       datasets: [
         {
           name: "Population",
@@ -14,7 +14,7 @@ class PopulationChartProcessor extends BaseChartProcessor {
     };
   }
 
-  getChartConfig(labels) {
+  getChartConfig(labels, chartType, ...args) {
     return {
       type: "bar",
       height: 300,
@@ -24,9 +24,9 @@ class PopulationChartProcessor extends BaseChartProcessor {
 }
 
 class EmploymentChartProcessor extends BaseChartProcessor {
-  processData(data) {
+  processData(config) {
     return {
-      labels: data.map((item) => item.municipality),
+      labels: config.data.map((item) => item.municipality),
       datasets: [
         {
           name: "Employment Rate",
@@ -36,7 +36,7 @@ class EmploymentChartProcessor extends BaseChartProcessor {
     };
   }
 
-  getChartConfig(labels) {
+  getChartConfig(labels, chartType, ...args) {
     return {
       type: "line",
       height: 250,
@@ -46,10 +46,10 @@ class EmploymentChartProcessor extends BaseChartProcessor {
 }
 
 class ChartFactory {
-  static createChart(elementId, type, data, year) {
-    const processor = this.getProcessor(type);
-    const { processedData, chartConfig } = processor.process(data, year);
-    const chartView = new ChartView(elementId);
+  static createChart(config) {
+    const processor = this.getProcessor(config.type);
+    const { processedData, chartConfig } = processor.process(config);
+    const chartView = new ChartView(config.elementId);
     chartView.clearChart();
     return chartView.renderChart(processedData, chartConfig.type, chartConfig);
   }
